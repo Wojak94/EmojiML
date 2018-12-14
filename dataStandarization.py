@@ -10,7 +10,7 @@ datapaths = ['/dataset emotes/Dataset.csv',
             '/dataset emotes/Dataset3.csv',
             '/dataset emotes/Dataset4.csv']
 
-# Function to scale original 1000 x 1000 drawing by a factor of 0.1
+# Helper function to scale original 1000 x 1000 drawing by a factor of 0.1
 def scale(x):
     a = x.split('; ')
     for num in range(len(a)):
@@ -18,6 +18,8 @@ def scale(x):
         for fact in range(len(a[num])):
             if a[num][fact]:
                 a[num][fact] = int(round(int(a[num][fact]) * 0.1))
+                if a[num][fact] >= 100:
+                    a[num][fact] = 99
             else:
                 del a[num]
     return a
@@ -47,10 +49,13 @@ temp = preprocess(datapaths)
 
 for iter in range(len(temp)):
     # Making blank 2D, 100x100 matrix for serialization of drawing
-    a = [[0] * 170 for i in range(170)]
+    a = [[0] * 100 for i in range(100)]
     # Applying drawing to a matrix
     for x in temp[iter][1]:
-        # print(temp[iter][1])
         a[x[0]][x[1]] = 1
     final_data.append(a)
     final_class.append(temp[iter][0])
+
+#ploting "random" image
+plt.imshow(final_data[4000])
+plt.show()
