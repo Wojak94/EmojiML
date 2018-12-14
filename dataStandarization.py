@@ -4,6 +4,12 @@ import matplotlib.image as mpimg
 import numpy as np
 import os
 
+# Paths to csv datasets
+datapaths = ['/dataset emotes/Dataset.csv',
+            '/dataset emotes/Dataset2.csv',
+            '/dataset emotes/Dataset3.csv',
+            '/dataset emotes/Dataset4.csv']
+
 # Function to scale original 1000 x 1000 drawing by a factor of 0.1
 def scale(x):
     a = x.split('; ')
@@ -16,28 +22,35 @@ def scale(x):
                 del a[num]
     return a
 
-# Reading data from csv to pandas DataFrame to prepare
-path = os.getcwd() + '/dataset emotes/Dataset.csv'
-data = pd.read_csv(path)
-# Droping 'id' column and deleting blank rows in data
-data.drop('id', axis=1, inplace=True)
-data.dropna(axis=0, how='any', inplace=True)
-data['dataset_points'] = data['dataset_points'].map(scale) # Scaling drowing to save space
+# Function to preprocess data, delete blank records and scale data
+def preprocess(paths):
+    temp = []
+    for path in paths:
+        # Reading data from csv to pandas DataFrame to prepare
+        print('Processing path: ' + path)
+        path = os.getcwd() + path
+        data = pd.read_csv(path)
+        # Droping 'id' column and deleting blank rows in data
+        data.drop('id', axis=1, inplace=True)
+        data.dropna(axis=0, how='any', inplace=True)
+        data['dataset_points'] = data['dataset_points'].map(scale)
+        # Reading drawing from DataFrame to multi-dimensional list
+        for row in data.iterrows():
+            index, dt = row
+            temp.append(dt.tolist())
+    print(f'Total number of records: {len(temp)}')
+    return temp
 
-# Reading drawing from DataFrame to multi-dimensional list
-temp = []
-for row in data.iterrows():
-    index, dt = row
-    temp.append(dt.tolist())
+final_data = []
+final_class = []
+temp = preprocess(datapaths)
 
-# Making blank 2D, 100x100 matrix for serialization of drawing
-a = [[0] * 100 for i in range(100)]
-
-# Applying drawing to a matrix
-for x in temp[100][1]:
-    a[x[0]][x[1]] = 1
-print(temp[200][0])
-
-# Ploting matrix as a image
-plt.imshow(a)
-plt.show()
+for iter in range(len(temp)):
+    # Making blank 2D, 100x100 matrix for serialization of drawing
+    a = [[0] * 170 for i in range(170)]
+    # Applying drawing to a matrix
+    for x in temp[iter][1]:
+        # print(temp[iter][1])
+        a[x[0]][x[1]] = 1
+    final_data.append(a)
+    final_class.append(temp[iter][0])
