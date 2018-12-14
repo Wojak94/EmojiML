@@ -4,6 +4,11 @@ import matplotlib.image as mpimg
 import numpy as np
 import os
 
+from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.externals import joblib
+from numpy import array
+
 # Paths to csv datasets
 datapaths = ['/dataset emotes/Dataset.csv',
             '/dataset emotes/Dataset2.csv',
@@ -43,8 +48,8 @@ def preprocess(paths):
     print(f'Total number of records: {len(temp)}')
     return temp
 
-final_data = []
-final_class = []
+all_X = []
+all_Y = []
 temp = preprocess(datapaths)
 
 for iter in range(len(temp)):
@@ -53,9 +58,24 @@ for iter in range(len(temp)):
     # Applying drawing to a matrix
     for x in temp[iter][1]:
         a[x[0]][x[1]] = 1
-    final_data.append(a)
-    final_class.append(temp[iter][0])
+    all_X.append(a)
+    all_Y.append(temp[iter][0])
+
+np_X = array(all_X)
+np_Y = array(all_Y)
 
 #ploting "random" image
-plt.imshow(final_data[4000])
+plt.imshow(np_X[4000])
 plt.show()
+
+# nsamples, nx, ny = np_X.shape
+# np_X_reshape = np_X.reshape((nsamples,nx*ny))
+#
+# X_train, X_test, y_train, y_test = train_test_split(np_X_reshape, np_Y)
+#
+# print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+#
+# clf = MLPClassifier(alpha=1e-5, hidden_layer_sizes=(1000, 500), random_state=1)
+# clf.fit(X_train, y_train)
+# print(clf.score(X_test, y_test))
+# joblib.dump(clf, 'my_model.pkl', compress=9)
