@@ -64,18 +64,21 @@ for iter in range(len(temp)):
 np_X = array(all_X)
 np_Y = array(all_Y)
 
-#ploting "random" image
+# #ploting "random" image
 plt.imshow(np_X[4000])
 plt.show()
 
-# nsamples, nx, ny = np_X.shape
-# np_X_reshape = np_X.reshape((nsamples,nx*ny))
-#
-# X_train, X_test, y_train, y_test = train_test_split(np_X_reshape, np_Y)
-#
-# print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
-#
-# clf = MLPClassifier(alpha=1e-5, hidden_layer_sizes=(1000, 500), random_state=1)
-# clf.fit(X_train, y_train)
-# print(clf.score(X_test, y_test))
-# joblib.dump(clf, 'my_model.pkl', compress=9)
+nsamples, nx, ny = np_X.shape
+np_X_reshape = np_X.reshape((nsamples,nx*ny))
+
+X_train, X_test, y_train, y_test = train_test_split(np_X_reshape, np_Y)
+
+print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+
+clf = MLPClassifier(alpha=1e-5, hidden_layer_sizes=(1000, 500), random_state=1)
+clf.fit(X_train, y_train)
+print(clf.score(X_test, y_test))
+joblib.dump(clf, 'my_model.pkl', compress=9)
+
+#model_clone = joblib.load('model(hls-1000-500)')
+#model_clone.predict(X_test[10])
