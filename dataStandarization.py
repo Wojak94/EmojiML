@@ -8,6 +8,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
 from numpy import array
+import tensorflow as tf
 
 # Paths to csv datasets
 datapaths = ['/dataset emotes/Dataset.csv',
@@ -65,20 +66,34 @@ np_X = array(all_X)
 np_Y = array(all_Y)
 
 # #ploting "random" image
-plt.imshow(np_X[4000])
-plt.show()
+#plt.imshow(np_X[4000])
+#plt.show()
 
 nsamples, nx, ny = np_X.shape
 np_X_reshape = np_X.reshape((nsamples,nx*ny))
 
-X_train, X_test, y_train, y_test = train_test_split(np_X_reshape, np_Y)
+x_train, x_test, y_train, y_test = train_test_split(np_X_reshape, np_Y)
 
-print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 
-clf = MLPClassifier(alpha=1e-5, hidden_layer_sizes=(1000, 500), random_state=1)
-clf.fit(X_train, y_train)
-print(clf.score(X_test, y_test))
-joblib.dump(clf, 'my_model.pkl', compress=9)
+class_names = list(set(y_train))
+y_train = array(list(map(lambda c: class_names.index(c), y_train)))
+y_test = array(list(map(lambda c: class_names.index(c), y_test)))
 
-#model_clone = joblib.load('model(hls-1000-500)')
-#model_clone.predict(X_test[10])
+
+
+model = tf.keras.models.Sequential([
+  tf.keras.layers.Flatten(input_shape=(10000,)),
+  tf.keras.layers.Dense(512, activation=tf.nn.relu),
+  tf.keras.layers.Dropout(0.2),
+  tf.keras.layers.Dense(10, activation=tf.nn.softmax)
+])
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.sparse_categorical_crossentropy,
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train, epochs=5)
+test_loss, test_acc = model.evaluate(x_test, y_test)
+print('Test accuracy: ', test_acc)
+
+model.save("my_model.h5")
