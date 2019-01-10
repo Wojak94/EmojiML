@@ -49,51 +49,53 @@ def preprocess(paths):
     print(f'Total number of records: {len(temp)}')
     return temp
 
-all_X = []
-all_Y = []
-temp = preprocess(datapaths)
+if __name__ == "__main__":
+    all_X = []
+    all_Y = []
+    temp = preprocess(datapaths)
 
-for iter in range(len(temp)):
-    # Making blank 2D, 100x100 matrix for serialization of drawing
-    a = [[0] * 100 for i in range(100)]
-    # Applying drawing to a matrix
-    for x in temp[iter][1]:
-        a[x[0]][x[1]] = 1
-    all_X.append(a)
-    all_Y.append(temp[iter][0])
+    for iter in range(len(temp)):
+        # Making blank 2D, 100x100 matrix for serialization of drawing
+        a = [[0] * 100 for i in range(100)]
+        # Applying drawing to a matrix
+        for x in temp[iter][1]:
+            a[x[0]][x[1]] = 1
+        all_X.append(a)
+        all_Y.append(temp[iter][0])
 
-np_X = array(all_X)
-np_Y = array(all_Y)
+    np_X = array(all_X)
+    np_Y = array(all_Y)
 
-# #ploting "random" image
-#plt.imshow(np_X[4000])
-#plt.show()
+    # #ploting "random" image
+    #plt.imshow(np_X[4000])
+    #plt.show()
 
-nsamples, nx, ny = np_X.shape
-np_X_reshape = np_X.reshape((nsamples,nx*ny))
+    nsamples, nx, ny = np_X.shape
+    np_X_reshape = np_X.reshape((nsamples,nx*ny))
 
-x_train, x_test, y_train, y_test = train_test_split(np_X_reshape, np_Y)
+    x_train, x_test, y_train, y_test = train_test_split(np_X_reshape, np_Y)
 
-print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
+    print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 
-class_names = list(set(y_train))
-y_train = array(list(map(lambda c: class_names.index(c), y_train)))
-y_test = array(list(map(lambda c: class_names.index(c), y_test)))
+    class_names = list(set(y_train))
 
+    y_train = array(list(map(lambda c: class_names.index(c), y_train)))
+    y_test = array(list(map(lambda c: class_names.index(c), y_test)))
 
+    print(class_names)
 
-model = tf.keras.models.Sequential([
-  tf.keras.layers.Flatten(input_shape=(10000,)),
-  tf.keras.layers.Dense(512, activation=tf.nn.relu),
-  tf.keras.layers.Dropout(0.2),
-  tf.keras.layers.Dense(10, activation=tf.nn.softmax)
-])
-model.compile(optimizer='adam',
-              loss=tf.keras.losses.sparse_categorical_crossentropy,
-              metrics=['accuracy'])
+    model = tf.keras.models.Sequential([
+      tf.keras.layers.Flatten(input_shape=(10000,)),
+      tf.keras.layers.Dense(512, activation=tf.nn.relu),
+      tf.keras.layers.Dropout(0.2),
+      tf.keras.layers.Dense(10, activation=tf.nn.softmax)
+    ])
+    model.compile(optimizer='adam',
+                  loss=tf.keras.losses.sparse_categorical_crossentropy,
+                  metrics=['accuracy'])
 
-model.fit(x_train, y_train, epochs=5)
-test_loss, test_acc = model.evaluate(x_test, y_test)
-print('Test accuracy: ', test_acc)
+    model.fit(x_train, y_train, epochs=5)
+    test_loss, test_acc = model.evaluate(x_test, y_test)
+    print('Test accuracy: ', test_acc)
 
-model.save("my_model.h5")
+    model.save("my_model.h5")
